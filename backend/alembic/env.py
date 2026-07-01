@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 
 from app.db.database import Base
 from app.models.user import User
+from app.models.team import Team
 
 # Load environment variables from .env
 load_dotenv()
