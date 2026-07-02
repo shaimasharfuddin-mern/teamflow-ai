@@ -1,5 +1,24 @@
 # Changelog
 
+
+All notable changes to this project will be documented in this file.
+
+## [0.2.0] - 2026-07-01
+
+### Added
+- Team model
+- Team schema
+- Team service layer
+- Team router
+- Create Team API
+- List My Teams API
+- Team ownership using authenticated user
+- Alembic migration for teams table
+
+## [0.1.0] - 2026-06-30
+
+### Added
+...
 All notable changes to **TeamFlow AI** will be documented in this file.
 
 ---

@@ -1,21 +1,52 @@
+from datetime import datetime, timedelta
+
+from jose import jwt
+from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
-from app.core.security import (
-    hash_password,
-    verify_password,
-    create_access_token,
-)
+from app.core.config import settings
 from app.models.user import User
 from app.schemas.user import UserCreate
 
+ALGORITHM = "HS256"
 
-def get_user_by_email(db: Session, email: str):
-    return db.query(User).filter(User.email == email).first()
+pwd_context = CryptContext(
+    schemes=["bcrypt"],
+    deprecated="auto",
+)
 
 
-def create_user(db: Session, user: UserCreate):
+# ----------------------------------------
+# PASSWORD UTILITIES
+# ----------------------------------------
 
-    existing_user = get_user_by_email(db, user.email)
+def hash_password(password: str):
+    return pwd_context.hash(password)
+
+
+def verify_password(
+    plain_password: str,
+    hashed_password: str,
+):
+    return pwd_context.verify(
+        plain_password,
+        hashed_password,
+    )
+
+
+# ----------------------------------------
+# CREATE USER
+# ----------------------------------------
+
+def create_user(
+    db: Session,
+    user: UserCreate,
+):
+    existing_user = (
+        db.query(User)
+        .filter(User.email == user.email)
+        .first()
+    )
 
     if existing_user:
         return None
@@ -33,26 +64,57 @@ def create_user(db: Session, user: UserCreate):
     return db_user
 
 
+# ----------------------------------------
+# CREATE JWT TOKEN
+# ----------------------------------------
+
+def create_access_token(
+    data: dict,
+    expires_delta: timedelta | None = None,
+):
+    to_encode = data.copy()
+
+    expire = datetime.utcnow() + (
+        expires_delta or timedelta(minutes=60)
+    )
+
+    to_encode.update({"exp": expire})
+
+    return jwt.encode(
+        to_encode,
+        settings.SECRET_KEY,
+        algorithm=ALGORITHM,
+    )
+
+
+# ----------------------------------------
+# LOGIN
+# ----------------------------------------
+
 def authenticate_user(
     db: Session,
     email: str,
     password: str,
 ):
+    user = (
+        db.query(User)
+        .filter(User.email == email)
+        .first()
+    )
 
-    db_user = get_user_by_email(db, email)
-
-    if db_user is None:
+    if not user:
         return None
 
     if not verify_password(
         password,
-        db_user.hashed_password,
+        user.hashed_password,
     ):
         return None
 
     access_token = create_access_token(
         data={
-            "sub": db_user.email,
+            "sub": user.email,
+            "user_id": user.id,
         }
     )
 
