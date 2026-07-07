@@ -1,16 +1,21 @@
 from pydantic import BaseModel
 
 
-class ProjectCreate(BaseModel):
+class ProjectBase(BaseModel):
     name: str
     description: str | None = None
+
+
+class ProjectCreate(ProjectBase):
     team_id: int
 
 
-class ProjectResponse(BaseModel):
+class ProjectUpdate(ProjectBase):
+    pass
+
+
+class ProjectResponse(ProjectBase):
     id: int
-    name: str
-    description: str | None = None
     team_id: int
 
     class Config:
