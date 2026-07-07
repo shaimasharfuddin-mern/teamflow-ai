@@ -2,6 +2,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from app.models.task import Task
+from app.models.project import Project
 from app.core.task_constants import VALID_STATUS_FLOW
 from app.services.team_access_service import is_team_member
 
@@ -11,10 +12,22 @@ from app.services.team_access_service import is_team_member
 # -----------------------------
 def create_task(db: Session, task_data, user_id: int):
 
-    if not is_team_member(db, task_data.team_id, user_id):
+    project = (
+        db.query(Project)
+        .filter(Project.id == task_data.project_id)
+        .first()
+    )
+
+    if not project:
+        raise HTTPException(
+            status_code=404,
+            detail="Project not found"
+        )
+
+    if not is_team_member(db, project.team_id, user_id):
         raise HTTPException(
             status_code=403,
-            detail="You are not a member of this project/team"
+            detail="You are not a member of this team"
         )
 
     task = Task(
@@ -22,9 +35,10 @@ def create_task(db: Session, task_data, user_id: int):
         description=task_data.description,
         status="todo",
         priority=task_data.priority,
-        team_id=task_data.team_id,
         project_id=task_data.project_id,
+        team_id=project.team_id,
         assignee_id=task_data.assignee_id,
+        due_date=task_data.due_date,
     )
 
     db.add(task)
@@ -35,7 +49,7 @@ def create_task(db: Session, task_data, user_id: int):
 
 
 # -----------------------------
-# UPDATE TASK (STRICT SECURITY)
+# UPDATE TASK
 # -----------------------------
 def update_task(db: Session, task_id: int, updates, user_id: int):
 
@@ -44,13 +58,9 @@ def update_task(db: Session, task_id: int, updates, user_id: int):
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
 
-    # must be team member
     if not is_team_member(db, task.team_id, user_id):
         raise HTTPException(status_code=403, detail="Not allowed")
 
-    # -----------------------------
-    # STATUS CHANGE RULES
-    # -----------------------------
     if updates.status:
 
         allowed_next = VALID_STATUS_FLOW.get(task.status, [])
@@ -61,7 +71,6 @@ def update_task(db: Session, task_id: int, updates, user_id: int):
                 detail=f"Invalid transition: {task.status} → {updates.status}"
             )
 
-        # STRICT RULE: only assignee can mark DONE
         if updates.status == "done" and task.assignee_id != user_id:
             raise HTTPException(
                 status_code=403,
@@ -70,19 +79,19 @@ def update_task(db: Session, task_id: int, updates, user_id: int):
 
         task.status = updates.status
 
-    # -----------------------------
-    # OTHER UPDATES
-    # -----------------------------
-    if hasattr(updates, "title") and updates.title:
+    if updates.title is not None:
         task.title = updates.title
 
-    if hasattr(updates, "description") and updates.description:
+    if updates.description is not None:
         task.description = updates.description
 
-    if hasattr(updates, "priority") and updates.priority:
+    if updates.priority is not None:
         task.priority = updates.priority
 
-    if hasattr(updates, "due_date"):
+    if updates.assignee_id is not None:
+        task.assignee_id = updates.assignee_id
+
+    if updates.due_date is not None:
         task.due_date = updates.due_date
 
     db.commit()

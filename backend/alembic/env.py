@@ -9,6 +9,9 @@ from dotenv import load_dotenv
 from app.db.database import Base
 from app.models.user import User
 from app.models.team import Team
+from app.models.project import Project
+from app.models.task import Task
+from app.models.team_member import TeamMember
 
 # Load environment variables from .env
 load_dotenv()

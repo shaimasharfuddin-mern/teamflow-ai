@@ -11,6 +11,19 @@ class Project(Base):
     name = Column(String(100), nullable=False)
     description = Column(String(255), nullable=True)
 
-    team_id = Column(Integer, ForeignKey("teams.id"), nullable=False)
+    team_id = Column(
+        Integer,
+        ForeignKey("teams.id"),
+        nullable=False,
+    )
 
-    team = relationship("Team")
+    team = relationship(
+        "Team",
+        back_populates="projects",
+    )
+
+    tasks = relationship(
+        "Task",
+        back_populates="project",
+        cascade="all, delete-orphan",
+    )

@@ -1,29 +1,73 @@
+import { NavLink } from "react-router-dom";
+
+import {
+  FaHome,
+  FaUsers,
+  FaFolderOpen,
+  FaTasks,
+  FaChartBar,
+  FaHeartbeat,
+  FaCog,
+  FaSignOutAlt,
+} from "react-icons/fa";
+
 export default function Sidebar() {
+  const menu = [
+    {
+      name: "Dashboard",
+      icon: <FaHome />,
+      path: "/dashboard",
+    },
+    {
+      name: "Teams",
+      icon: <FaUsers />,
+      path: "/teams",
+    },
+    {
+      name: "Projects",
+      icon: <FaFolderOpen />,
+      path: "/projects",
+    },
+    {
+      name: "Tasks",
+      icon: <FaTasks />,
+      path: "/tasks",
+    },
+    {
+      name: "Analytics",
+      icon: <FaChartBar />,
+      path: "/analytics",
+    },
+    {
+      name: "Health",
+      icon: <FaHeartbeat />,
+      path: "/health",
+    },
+  ];
+
   return (
-    <div
-      style={{
-        width: "250px",
-        background: "#1F2937",
-        color: "white",
-        padding: "30px",
-        minHeight: "100vh",
-      }}
-    >
-      <h2>TeamFlow AI</h2>
+    <div className="sidebar">
+      <h2 className="logo">TeamFlow AI</h2>
 
-      <hr />
+      <nav>
+        {menu.map((item) => (
+          <NavLink
+            key={item.name}
+            to={item.path}
+            className={({ isActive }) =>
+              isActive ? "menu active" : "menu"
+            }
+          >
+            <span>{item.icon}</span>
+            <span>{item.name}</span>
+          </NavLink>
+        ))}
+      </nav>
 
-      <p>🏠 Dashboard</p>
-
-      <p>👥 Teams</p>
-
-      <p>📁 Projects</p>
-
-      <p>✅ Tasks</p>
-
-      <p>📊 Analytics</p>
-
-      <p>⚙ Settings</p>
+      <button className="logout-btn">
+        <FaSignOutAlt />
+        Logout
+      </button>
     </div>
   );
 }

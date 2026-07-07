@@ -23,9 +23,9 @@ router = APIRouter(
 def create_new_project(
     project: ProjectCreate,
     db: Session = Depends(get_db),
-    current_user_id: int = Depends(get_current_user),
+    current_user = Depends(get_current_user)
 ):
-    return create_project(db, project, current_user_id)
+    return create_project(db, project, current_user["user_id"])
 
 
 # -------------------------
@@ -35,6 +35,6 @@ def create_new_project(
 def list_projects(
     team_id: int,
     db: Session = Depends(get_db),
-    current_user_id: int = Depends(get_current_user),
+   current_user = Depends(get_current_user)
 ):
-    return get_team_projects(db, team_id, current_user_id)
+    return get_team_projects(db, team_id, current_user["user_id"])

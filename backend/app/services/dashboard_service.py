@@ -28,7 +28,7 @@ def get_dashboard_stats(db: Session, user):
         health = int((completed_tasks / total_tasks) * 100)
 
     return {
-        "user": user["email"],
+        "user": user.email,
         "teams": total_teams,
         "projects": total_projects,
         "tasks": total_tasks,

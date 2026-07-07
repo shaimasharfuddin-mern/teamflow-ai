@@ -17,4 +17,24 @@ class Team(Base):
         nullable=False,
     )
 
-    owner = relationship("User")
+    owner = relationship(
+        "User",
+        back_populates="teams",
+    )
+
+    members = relationship(
+        "TeamMember",
+        back_populates="team",
+        cascade="all, delete-orphan",
+    )
+
+    projects = relationship(
+        "Project",
+        back_populates="team",
+        cascade="all, delete-orphan",
+    )
+    tasks = relationship(
+    "Task",
+    back_populates="team",
+    cascade="all, delete-orphan",
+)

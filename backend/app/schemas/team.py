@@ -1,15 +1,21 @@
 from pydantic import BaseModel
 
 
-class TeamCreate(BaseModel):
+class TeamBase(BaseModel):
     name: str
     description: str | None = None
 
 
-class TeamResponse(BaseModel):
+class TeamCreate(TeamBase):
+    pass
+
+
+class TeamUpdate(TeamBase):
+    pass
+
+
+class TeamResponse(TeamBase):
     id: int
-    name: str
-    description: str | None = None
     owner_id: int
 
     class Config:

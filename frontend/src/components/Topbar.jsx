@@ -1,18 +1,30 @@
+import { FaBell, FaSearch, FaUserCircle } from "react-icons/fa";
+
 export default function Topbar({ user }) {
   return (
-    <div
-      style={{
-        background: "white",
-        padding: "20px 30px",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        boxShadow: "0 2px 8px rgba(0,0,0,.08)",
-      }}
-    >
+    <div className="topbar">
       <h2>Dashboard</h2>
 
-      <h4>{user}</h4>
+      <div className="topbar-right">
+        <div className="search-box">
+          <FaSearch />
+
+          <input
+            type="text"
+            placeholder="Search..."
+          />
+        </div>
+
+        <button className="notification-btn">
+          <FaBell />
+        </button>
+
+        <div className="user-info">
+          <FaUserCircle className="avatar" />
+
+          <span>{user}</span>
+        </div>
+      </div>
     </div>
   );
 }

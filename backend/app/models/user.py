@@ -17,3 +17,14 @@ class User(Base):
         back_populates="owner",
         cascade="all, delete-orphan"
     )
+
+    tasks = relationship(
+        "Task",
+        back_populates="assignee"
+    )
+
+    memberships = relationship(
+    "TeamMember",
+    back_populates="user",
+    cascade="all, delete"
+)
